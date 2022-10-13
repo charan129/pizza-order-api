@@ -30,8 +30,12 @@ def welcome():                                      #welcome route
 def save_order():
     order_object = Order(uuid.uuid4().hex, request.json)        # create object from class Order and 
                                                                 # uuid generates a unique id for each order
-    connection = pika.BlockingConnection(
-        pika.ConnectionParameters("rabbitmq"))                      #connecting to rabbitmq service
+    try:                                                     
+        connection = pika.BlockingConnection(
+        pika.ConnectionParameters("rabbitmq"))
+    except:
+        return "RabbitMQ has not yet started, try again in few seconds"  
+                                                                        #connecting to rabbitmq service
     channel = connection.channel()
     channel.queue_declare(queue='task_queue', durable=True)            #creating a message queue
     channel.basic_publish(
